@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CrawlStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model CrawlRun {
+  id          String      @id @default(cuid())
+  startUrl    String
+  status      CrawlStatus @default(QUEUED)
+  createdAt   DateTime    @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+  pages       Page[]
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  crawlRunId  String
+  crawlRun    CrawlRun @relation(fields: [crawlRunId], references: [id])
+  url         String
+  title       String?
+  rawHtml     String
+  extractedText String
+  statusCode  Int
+  fetchedAt   DateTime @default(now())
+
+  @@index([crawlRunId])
+  @@index([url])
+}
+
