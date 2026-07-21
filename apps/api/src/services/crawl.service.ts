@@ -1,5 +1,5 @@
 import { prisma } from "../db/prisma.js";
-import { crawlQueue } from "../queues/crawl.queue.js";
+import { crawlerQueue } from "../queues/crawler.queue.js";
 
 export async function createCrawlRun(url: string) {
     const crawlRun = await prisma.crawlRun.create({
@@ -8,7 +8,7 @@ export async function createCrawlRun(url: string) {
         },
     });
 
-    const job = await crawlQueue.add("fetch-page", {
+    const job = await crawlerQueue.add("crawl", {
         crawlRunId: crawlRun.id,
         url,
     });

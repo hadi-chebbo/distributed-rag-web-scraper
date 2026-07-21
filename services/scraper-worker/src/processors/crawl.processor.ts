@@ -1,11 +1,11 @@
 import { CrawlStatus } from "@prisma/client";
-import { crawlJobSchema, } from "@scraper/shared";
+import { crawlerJobSchema, } from "@scraper/shared";
 import { fetchPage } from "../services/page-fetcher.service.js";
 import { parseHtml } from "../services/html-parser.service.js";
 import { markCrawlCompleted, markCrawlFailed, markCrawlRunning, savePage } from "../services/page.service.js";
 
 export async function processCrawlJob(job: any) {
-    const { crawlRunId, url } = crawlJobSchema.parse(job.data);
+    const { crawlRunId, url } = crawlerJobSchema.parse(job.data);
 
     await markCrawlRunning(crawlRunId);
 

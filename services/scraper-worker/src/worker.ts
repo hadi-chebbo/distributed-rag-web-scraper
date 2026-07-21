@@ -1,14 +1,15 @@
 import { Worker } from "bullmq";
-import { CRAWL_QUEUE, createRedisConnection } from "@scraper/shared";
+import { CRAWLER_QUEUE } from "@scraper/shared";
+import { redis } from "./redis/connection.js";
 import { processCrawlJob } from "./processors/crawl.processor.js";
 import { shutdown } from "./shutdown.js";
 
 
 const worker = new Worker(
-  CRAWL_QUEUE,
+  CRAWLER_QUEUE,
   processCrawlJob,
   {
-    connection: createRedisConnection(),
+    connection: redis,
     concurrency: 2,
   }
 );

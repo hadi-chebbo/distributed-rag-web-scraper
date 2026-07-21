@@ -1,6 +1,6 @@
 import { FastifyReply,FastifyRequest } from "fastify";
 import { crawlSchema } from "../schemas/crawl.schema.js";
-import { createCrawlRun, getCrawlRun } from "../services/crawl-run.service.js";
+import { createCrawlRun, getCrawlRun } from "../services/crawl.service.js";
 
 export async function createCrawl(request: FastifyRequest, reply: FastifyReply) {
     const input = crawlSchema.safeParse(request.body);
