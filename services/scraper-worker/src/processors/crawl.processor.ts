@@ -1,4 +1,3 @@
-import { CrawlStatus } from "@prisma/client";
 import { crawlerJobSchema, } from "@scraper/shared";
 import { fetchPage } from "../services/page-fetcher.service.js";
 import { parseHtml } from "../services/html-parser.service.js";
