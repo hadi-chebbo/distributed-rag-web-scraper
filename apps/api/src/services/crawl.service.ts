@@ -13,6 +13,8 @@ export async function createCrawlRun(url: string) {
         url,
     });
 
+    console.log("Added crawler job: ", job.id, job.data);
+
     return {
         crawlRun,
         job,

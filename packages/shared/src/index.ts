@@ -56,3 +56,5 @@ export function createScraperQueue() {
     },
   });
 }
+
+export * from "./parser/html-parser.js";

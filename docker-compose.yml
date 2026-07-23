@@ -54,6 +54,19 @@ services:
       redis:
         condition: service_healthy
 
+  crawler-worker:
+      build:
+        context: .
+        target: crawler-worker
+      environment:
+        DATABASE_URL: postgresql://scraper:scraper@postgres:5432/distributed_rag?schema=public
+        REDIS_URL: redis://redis:6379
+      depends_on:
+        postgres:
+          condition: service_healthy
+        redis:
+          condition: service_healthy
+
 volumes:
   postgres_data:
 

@@ -15,3 +15,6 @@ CMD ["npm", "run", "dev", "--workspace=@scraper/api"]
 FROM base AS scraper-worker
 CMD ["npm", "run", "dev", "--workspace=@scraper/scraper-worker"]
 
+FROM base AS crawler-worker
+CMD ["npm", "run", "dev", "--workspace=@scraper/crawler-worker"]
+
