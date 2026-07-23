@@ -1,42 +1,82 @@
 import { scraperJobSchema } from "@scraper/shared";
 import { fetchPage } from "./page-fetcher.service.js";
 import { parseHtml } from "./html-parser.service.js";
-import { findPageByHash, savePage } from "./page.service.js";
+import { findPageByUrl, savePage, savePageVersion, updatePage } from "./page.service.js";
 import crypto from "crypto";
 
 
 export async function scraperService(job: unknown) {
     const data = scraperJobSchema.parse(job);
 
-
     const pageData = await fetchPage(data.url);
-
 
     const parsedPage = parseHtml(
         pageData.html
     );
 
     const contentHash = crypto
-                            .createHash("sha256")
-                            .update(parsedPage.extractedText)
-                            .digest("hex");
+        .createHash("sha256")
+        .update(parsedPage.extractedText)
+        .digest("hex");
 
-    const existingPage = await findPageByHash(contentHash);
+
+    const existingPage = await findPageByUrl(data.url);
+
 
     if(existingPage) {
-        console.log("Duplicate content detected");
-        return existingPage;
+
+        if(existingPage.contentHash === contentHash) {
+
+            console.log(
+                "No changes:",
+                data.url
+            );
+
+            return existingPage;
+        }
+
+
+        console.log(
+            "Content changed:",
+            data.url
+        );
+
+
+        await savePageVersion({
+            pageId: existingPage.id,
+            contentHash: existingPage.contentHash!,
+            rawHtml: existingPage.rawHtml,
+            extractedText: existingPage.extractedText,
+        });
+
+
+        return updatePage(
+            existingPage.id,
+            {
+                title: parsedPage.title ?? "",
+                rawHtml: pageData.html,
+                extractedText: parsedPage.extractedText,
+                contentHash,
+                statusCode: pageData.statusCode,
+                fetchedAt: new Date()
+            }
+        );
     }
 
-    const page = await savePage({
+
+    console.log(
+        "New page:",
+        data.url
+    );
+
+
+    return savePage({
         crawlRunId: data.crawlRunId,
         url: data.url,
         title: parsedPage.title,
-        extractedText: parsedPage.extractedText,
         rawHtml: pageData.html,
-        contentHash: contentHash,
-        statusCode: pageData.statusCode,
+        extractedText: parsedPage.extractedText,
+        contentHash,
+        statusCode: pageData.statusCode
     });
-
-    return page;
 }

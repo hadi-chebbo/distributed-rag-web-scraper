@@ -2,7 +2,7 @@ import { prisma } from "../db/prisma.js";
 import { cacheUrl, isUrlCached } from "./url-cache.service.js";
 
 
-export async function isUrlVisited(url: string) {
+export async function isUrlVisited(url: string, crawlRunId: string) {
     const cached = await isUrlCached(url);
 
     if(cached) {
@@ -10,7 +10,10 @@ export async function isUrlVisited(url: string) {
     }
     const existing = await prisma.crawledUrl.findUnique({
                                 where:{
-                                    url
+                                    url_crawlRunId:{
+                                        url,
+                                        crawlRunId
+                                    }
                                 }
                             });
         

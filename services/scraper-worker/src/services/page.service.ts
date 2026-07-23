@@ -13,14 +13,23 @@ export async function markCrawlRunning(crawlRunId: string) {
     });
 }
 
-export async function findPageByHash(
-    contentHash: string
-) {
+export async function findPageByHash(contentHash: string) {
     return prisma.page.findFirst({
         where: {
             contentHash
         }
     });
+}
+
+export async function findPageByUrl(url: string) {
+  return prisma.page.findFirst({
+      where: {
+            url
+      },
+      orderBy: {
+        fetchedAt: "desc"
+      }
+  })
 }
 
 export async function savePage(data: {
@@ -35,6 +44,33 @@ export async function savePage(data: {
     return prisma.page.create({
         data,
     });
+}
+
+export async function updatePage(pageId: string, data: {
+  title: string;
+  rawHtml: string;
+  extractedText: string;
+  contentHash: string;
+  statusCode: number;
+  fetchedAt: Date;
+}) {
+  return prisma.page.update({
+    where: {
+      id: pageId
+    },
+    data
+  });
+}
+
+export async function savePageVersion(data: {
+  pageId: string;
+  contentHash: string;
+  rawHtml: string;
+  extractedText: string;
+}) {
+  return prisma.pageVersion.create({
+    data
+  });
 }
 
 export async function markCrawlCompleted(

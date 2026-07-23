@@ -27,7 +27,7 @@ export async function crawlerService(job:any){
 
     for (const link of links) {
 
-        const visited = await isUrlVisited(link);
+        const visited = await isUrlVisited(link,data.crawlRunId);
 
         if(visited) {
             console.log("Skipping visited: ", link);

@@ -39,14 +39,33 @@ model Page {
   statusCode  Int
   fetchedAt   DateTime @default(now())
 
+  versions PageVersion[]
+
   @@index([crawlRunId])
   @@index([contentHash])
   @@index([url])
 }
 
+model PageVersion {
+  id             String   @id @default(cuid())
+
+  pageId         String
+  page           Page     @relation(fields: [pageId],references: [id],onDelete: Cascade)
+
+  contentHash    String
+  rawHtml        String
+  extractedText  String
+
+  createdAt      DateTime @default(now())
+
+
+  @@index([pageId])
+  @@index([contentHash])  
+}
+
 model CrawledUrl {
   id          String          @id @default(cuid())
-  url         String          @unique
+  url         String          
   crawlRunId  String
 
   status      CrawlUrlStatus  @default(PENDING)
@@ -56,6 +75,7 @@ model CrawledUrl {
 
   crawlRun CrawlRun @relation(fields: [crawlRunId], references: [id], onDelete: Cascade)
 
+  @@unique([url, crawlRunId])
   @@index([crawlRunId])
   @@index([status])
 }
