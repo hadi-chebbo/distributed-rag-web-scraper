@@ -13,12 +13,23 @@ export async function markCrawlRunning(crawlRunId: string) {
     });
 }
 
+export async function findPageByHash(
+    contentHash: string
+) {
+    return prisma.page.findFirst({
+        where: {
+            contentHash
+        }
+    });
+}
+
 export async function savePage(data: {
     crawlRunId: string;
     url: string;
     title: string | null;
     rawHtml: string;
     extractedText: string;
+    contentHash: string;
     statusCode: number;
 }) {
     return prisma.page.create({

@@ -34,10 +34,13 @@ model Page {
   title       String?
   rawHtml     String
   extractedText String
+  contentHash String?
+
   statusCode  Int
   fetchedAt   DateTime @default(now())
 
   @@index([crawlRunId])
+  @@index([contentHash])
   @@index([url])
 }
 
