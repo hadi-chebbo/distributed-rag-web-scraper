@@ -23,12 +23,13 @@ model CrawlRun {
   completedAt DateTime?
   error       String?
   pages       Page[]
+  urls        CrawledUrl[]
 }
 
 model Page {
   id          String   @id @default(cuid())
   crawlRunId  String
-  crawlRun    CrawlRun @relation(fields: [crawlRunId], references: [id])
+  crawlRun    CrawlRun @relation(fields: [crawlRunId], references: [id], onDelete: Cascade)
   url         String
   title       String?
   rawHtml     String
@@ -40,3 +41,26 @@ model Page {
   @@index([url])
 }
 
+model CrawledUrl {
+  id          String          @id @default(cuid())
+  url         String          @unique
+  crawlRunId  String
+
+  status      CrawlUrlStatus  @default(PENDING)
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  crawlRun CrawlRun @relation(fields: [crawlRunId], references: [id], onDelete: Cascade)
+
+  @@index([crawlRunId])
+  @@index([status])
+}
+
+
+enum CrawlUrlStatus {
+  PENDING
+  CRAWLING
+  COMPLETED
+  FAILED
+}

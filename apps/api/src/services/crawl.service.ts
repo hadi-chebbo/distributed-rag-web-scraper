@@ -5,6 +5,11 @@ export async function createCrawlRun(url: string) {
     const crawlRun = await prisma.crawlRun.create({
         data: {
             startUrl: url,
+            urls:{
+                create:{
+                    url,
+                }
+            }
         },
     });
 

@@ -3,6 +3,7 @@ import { fetchPage } from "./page-fetcher.js";
 import { parseHtml } from "@scraper/shared";
 import { extractLinks } from "./link-extractor.service.js";
 import { scraperQueue } from "../queues/scraper.queue.js";
+import { isUrlVisited, registerUrl } from "./url-tracker.service.js";
 
 export async function crawlerService(job:any){
 
@@ -25,6 +26,15 @@ export async function crawlerService(job:any){
     );
 
     for (const link of links) {
+
+        const visited = await isUrlVisited(link);
+
+        if(visited) {
+            console.log("Skipping visited: ", link);
+            continue;
+        }
+
+        await registerUrl(link,data.crawlRunId);
 
         console.log("Adding scraper job:", link);
 
