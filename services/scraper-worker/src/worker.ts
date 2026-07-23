@@ -7,7 +7,34 @@ import { redis } from "./redis/connection.js";
 const worker = new Worker(
     SCRAPER_QUEUE,
     async(job)=>{
-      return scraperService(job.data);
+
+        console.log(
+            "Processing scraper job:",
+            job.id,
+            job.data
+        );
+
+      try {
+
+            const result = await scraperService(job.data);
+
+            console.log(
+                "Scraper service finished:",
+                job.id
+            );
+
+            return result;
+
+        } catch(error){
+
+            console.error(
+                "Scraper service error:",
+                job.id,
+                error
+            );
+
+            throw error;
+        }
     },
     {
       connection: redis
@@ -31,6 +58,9 @@ worker.on("failed", (job, error) => {
 
 
 const shutdown = async () => {
+
+    console.log("Shutting down scraper worker...");
+
     await worker.close();
     await redis.quit();
     process.exit(0);
