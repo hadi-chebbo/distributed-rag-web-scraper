@@ -4,6 +4,7 @@ import { parseHtml } from "@scraper/shared";
 import { extractLinks } from "./link-extractor.service.js";
 import { scraperQueue } from "../queues/scraper.queue.js";
 import { isUrlVisited, registerUrl } from "./url-tracker.service.js";
+import { isAllowed } from "./robots.service.js";
 
 export async function crawlerService(job:any){
 
@@ -26,6 +27,18 @@ export async function crawlerService(job:any){
     );
 
     for (const link of links) {
+
+        const allowed = await isAllowed(link);
+
+        if(!allowed) {
+            
+            console.log(
+                "Blocked by robots.txt",
+                link
+            );
+
+            continue;
+        }
 
         const visited = await isUrlVisited(link,data.crawlRunId);
 
