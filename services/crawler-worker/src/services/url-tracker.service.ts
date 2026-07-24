@@ -3,9 +3,10 @@ import { cacheUrl, isUrlCached } from "./url-cache.service.js";
 
 
 export async function isUrlVisited(url: string, crawlRunId: string) {
-    const cached = await isUrlCached(url);
+    const cached = await isUrlCached(url,crawlRunId);
 
     if(cached) {
+        console.log("the url exists in cache");
         return true;
     }
     const existing = await prisma.crawledUrl.findUnique({
@@ -35,7 +36,7 @@ export async function registerUrl(url: string, crawlRunId: string) {
                         }
                     });
 
-    await cacheUrl(url);
+    await cacheUrl(url,crawlRunId);
 
     return result;
 }

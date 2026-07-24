@@ -69,6 +69,7 @@ export async function scraperService(job: unknown) {
         data.url
     );
 
+    console.log("Generated hash:", contentHash);
 
     return savePage({
         crawlRunId: data.crawlRunId,
