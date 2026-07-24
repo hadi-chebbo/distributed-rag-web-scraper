@@ -1,14 +1,22 @@
 import { scraperJobSchema } from "@scraper/shared";
-import { fetchPage } from "./page-fetcher.service.js";
-import { parseHtml } from "./html-parser.service.js";
+import { fetchPage } from "./fetchers/fetch-strategy.service.js";
+import { parseHtml } from "./parsers/html-parser.service.js";
 import { findPageByUrl, savePage, savePageVersion, updatePage } from "./page.service.js";
 import crypto from "crypto";
 
 
 export async function scraperService(job: unknown) {
     const data = scraperJobSchema.parse(job);
+    let pageData;
 
-    const pageData = await fetchPage(data.url);
+    try {
+        pageData = await fetchPage(data.url);
+    } catch(error) {
+
+        console.error("Failed fetching: ", data.url, error);
+        throw error;
+    }
+    
 
     const parsedPage = parseHtml(
         pageData.html

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function fetchPage(url: string) {
+export async function fetchWithHttp(url: string) {
     const response = await axios.get<string>(url, {
         timeout: 15_000,
         responseType: "text",
