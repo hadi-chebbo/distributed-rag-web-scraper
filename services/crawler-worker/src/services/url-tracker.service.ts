@@ -6,18 +6,13 @@ export async function isUrlVisited(url: string, crawlRunId: string) {
     const cached = await isUrlCached(url,crawlRunId);
 
     if(cached) {
-        console.log("the url exists in cache");
         return true;
     }
     const existing = await prisma.crawledUrl.findUnique({
-                                where:{
-                                    url_crawlRunId:{
-                                        url,
-                                        crawlRunId
-                                    }
-                                }
-                            });
-        
+        where:{
+            url_crawlRunId:{url,crawlRunId}
+        }
+    });                            
 
     if(existing) {
         return true;
@@ -29,7 +24,7 @@ export async function isUrlVisited(url: string, crawlRunId: string) {
 
 export async function registerUrl(url: string, crawlRunId: string) {
 
-    const result =  prisma.crawledUrl.create({
+    const result = await prisma.crawledUrl.create({
                         data:{
                             url,
                             crawlRunId
