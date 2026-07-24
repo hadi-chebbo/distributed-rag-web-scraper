@@ -2,7 +2,7 @@ import { scraperJobSchema } from "@scraper/shared";
 import { fetchPage } from "./fetchers/fetch-strategy.service.js";
 import { parseHtml } from "./parsers/html-parser.service.js";
 import { findPageByUrl, savePage, savePageVersion, updatePage } from "./page.service.js";
-import crypto from "crypto";
+import { generateContentHash } from "./hashing/content-hash.service.js";
 
 
 export async function scraperService(job: unknown) {
@@ -22,10 +22,7 @@ export async function scraperService(job: unknown) {
         pageData.html
     );
 
-    const contentHash = crypto
-        .createHash("sha256")
-        .update(parsedPage.extractedText)
-        .digest("hex");
+    const contentHash = generateContentHash(parsedPage.extractedText);
 
 
     const existingPage = await findPageByUrl(data.url);
