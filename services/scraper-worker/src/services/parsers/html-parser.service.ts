@@ -7,7 +7,7 @@ export function parseHtml(html: string) {
 
 
     // Remove useless content
-    $("script, style, noscript").remove();
+    $("script, style, noscript, nav, footer, aside").remove();
 
 
     const title =
@@ -107,7 +107,7 @@ export function parseHtml(html: string) {
     */
 
     const extractedText = [
-        
+
         bodyText
             ? `Content:\n${bodyText}`
             : "",
