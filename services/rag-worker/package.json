@@ -1,0 +1,22 @@
+{
+  "name": "@scraper/rag-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/worker.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@scraper/shared": "*",
+    "@prisma/client": "^6.19.3",
+    "bullmq": "^5.0.0",
+    "ioredis": "^5.0.0",
+    "gpt-tokenizer": "^2.1.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.3",
+    "@types/node": "^22.0.0"
+  }
+}

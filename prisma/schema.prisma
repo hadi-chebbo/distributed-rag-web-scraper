@@ -40,6 +40,7 @@ model Page {
   fetchedAt   DateTime @default(now())
 
   versions PageVersion[]
+  chunks PageChunk[]
 
   @@index([crawlRunId])
   @@index([contentHash])
@@ -61,6 +62,22 @@ model PageVersion {
 
   @@index([pageId])
   @@index([contentHash])  
+}
+
+model PageChunk {
+  id        String   @id @default(cuid())
+
+  pageId    String
+  page      Page     @relation(fields: [pageId],references: [id],onDelete: Cascade)
+
+  content   String
+
+  chunkIndex Int
+
+  createdAt DateTime @default(now())
+
+
+  @@index([pageId])
 }
 
 model CrawledUrl {

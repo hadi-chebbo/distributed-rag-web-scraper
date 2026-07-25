@@ -1,15 +1,51 @@
 import * as cheerio from "cheerio";
 
 
-export function parseHtml(html: string) {
+export interface ParsedPage {
+
+    title: string | null;
+
+    extractedText: string;
+
+    sections: {
+        heading: string | null;
+        content: string;
+    }[];
+
+    tables: string[];
+
+    links: {
+        text: string;
+        url: string;
+    }[];
+
+    documents: {
+        text: string;
+        url: string;
+    }[];
+}
+
+
+
+export function parseHtml(
+    html: string
+): ParsedPage {
+
 
     const $ = cheerio.load(html);
 
 
-    // Remove useless content
-    $("script, style, noscript, nav, footer, aside").remove();
+    /*
+        Remove useless content
+    */
+    $("script, style, noscript, nav, footer, aside")
+        .remove();
 
 
+
+    /*
+        Page title
+    */
     const title =
         $("title")
             .first()
@@ -19,13 +55,56 @@ export function parseHtml(html: string) {
 
 
     /*
-        Extract normal body text
+        Extract semantic sections
+        based on headings
     */
-    const bodyText =
-        $("body")
-            .text()
-            .replace(/\s+/g, " ")
-            .trim();
+    const sections: ParsedPage["sections"] = [];
+
+
+    $("h1, h2, h3").each((_, element) => {
+
+
+        const heading =
+            $(element)
+                .text()
+                .replace(/\s+/g, " ")
+                .trim();
+
+
+
+        let content = "";
+
+
+
+        $(element)
+            .nextUntil("h1, h2, h3")
+            .each((_, child) => {
+
+                content +=
+                    $(child)
+                        .text()
+                        .replace(/\s+/g, " ")
+                        .trim()
+                    + " ";
+
+            });
+
+
+
+        content = content.trim();
+
+
+
+        if(content) {
+
+            sections.push({
+                heading,
+                content
+            });
+
+        }
+
+    });
 
 
 
@@ -34,6 +113,7 @@ export function parseHtml(html: string) {
     */
     const tables = $("table")
         .map((_, table) => {
+
 
             const rows = $(table)
                 .find("tr")
@@ -54,7 +134,9 @@ export function parseHtml(html: string) {
                 .get();
 
 
+
             return rows.join("\n");
+
 
         })
         .get();
@@ -64,52 +146,69 @@ export function parseHtml(html: string) {
     /*
         Extract links
     */
-    const links = $("a")
-        .map((_, link) => {
-
-            const text =
-                $(link)
-                    .text()
-                    .replace(/\s+/g, " ")
-                    .trim();
+    const links: ParsedPage["links"] =
+        $("a")
+            .map((_, link) => {
 
 
-            const href =
-                $(link)
-                    .attr("href");
-
-
-            if(!href) {
-                return null;
-            }
-
-
-            return `${text} -> ${href}`;
-
-        })
-        .get()
-        .filter(Boolean);
+                const text =
+                    $(link)
+                        .text()
+                        .replace(/\s+/g, " ")
+                        .trim();
 
 
 
-    /*
-        Extract documents
-    */
-    const documents = links.filter(link =>
-        /\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/i
-            .test(link!)
-    );
+                const url =
+                    $(link)
+                        .attr("href");
+
+
+
+                if(!url) {
+                    return null;
+                }
+
+
+
+                return {
+                    text,
+                    url
+                };
+
+            })
+            .get()
+            .filter(Boolean);
 
 
 
     /*
-        Build RAG-friendly text
+        Extract downloadable documents
     */
+    const documents =
+        links.filter(link =>
+            /\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/i
+                .test(link.url)
+        );
 
+
+
+    /*
+        Build plain text version
+        This is what stays in Page table
+    */
     const extractedText = [
 
-        bodyText
-            ? `Content:\n${bodyText}`
+        title
+            ? `Title:\n${title}`
+            : "",
+
+
+        sections.length
+            ? sections.map(section =>
+                `${section.heading ?? ""}
+${section.content}`
+            ).join("\n\n")
             : "",
 
 
@@ -119,12 +218,24 @@ export function parseHtml(html: string) {
 
 
         documents.length
-            ? `Documents:\n${documents.join("\n")}`
+            ? `Documents:\n${
+                documents
+                    .map(doc =>
+                        `${doc.text} -> ${doc.url}`
+                    )
+                    .join("\n")
+            }`
             : "",
 
 
         links.length
-            ? `Links:\n${links.join("\n")}`
+            ? `Links:\n${
+                links
+                    .map(link =>
+                        `${link.text} -> ${link.url}`
+                    )
+                    .join("\n")
+            }`
             : ""
 
     ]
@@ -136,5 +247,9 @@ export function parseHtml(html: string) {
     return {
         title,
         extractedText,
+        sections,
+        tables,
+        links,
+        documents
     };
 }
