@@ -8,15 +8,17 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@scraper/shared": "*",
     "@prisma/client": "^6.19.3",
+    "@qdrant/js-client-rest": "^1.18.0",
+    "@scraper/shared": "*",
     "bullmq": "^5.0.0",
+    "gpt-tokenizer": "^2.1.2",
     "ioredis": "^5.0.0",
-    "gpt-tokenizer": "^2.1.2"
+    "ollama": "^0.6.3"
   },
   "devDependencies": {
+    "@types/node": "^22.20.1",
     "tsx": "^4.0.0",
-    "typescript": "^5.8.3",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.8.3"
   }
 }

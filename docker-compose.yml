@@ -25,6 +25,14 @@ services:
       timeout: 5s
       retries: 10
 
+  qdrant:
+    image: qdrant/qdrant:v1.14.1
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
   api:
     build:
       context: .
@@ -55,18 +63,35 @@ services:
         condition: service_healthy
 
   crawler-worker:
-      build:
-        context: .
-        target: crawler-worker
-      environment:
-        DATABASE_URL: postgresql://scraper:scraper@postgres:5432/distributed_rag?schema=public
-        REDIS_URL: redis://redis:6379
-      depends_on:
-        postgres:
-          condition: service_healthy
-        redis:
-          condition: service_healthy
+    build:
+      context: .
+      target: crawler-worker
+    environment:
+      DATABASE_URL: postgresql://scraper:scraper@postgres:5432/distributed_rag?schema=public
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  rag-worker:
+    build:
+      context: .
+      target: rag-worker
+    environment:
+      DATABASE_URL: postgresql://scraper:scraper@postgres:5432/distributed_rag?schema=public
+      REDIS_URL: redis://redis:6379
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: http://host.docker.internal:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
 
 volumes:
   postgres_data:
-
+  qdrant_data:

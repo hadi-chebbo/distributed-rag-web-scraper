@@ -89,6 +89,10 @@ export async function scraperService(job: unknown) {
 
     console.log("Adding RAG job:", page.url);
 
+    console.log(
+        JSON.stringify(parsedPage, null, 2)
+    );
+
     await ragQueue.add("process-page", {
         pageId: page.id,
         content: {

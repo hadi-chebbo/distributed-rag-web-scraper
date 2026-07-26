@@ -1,7 +1,8 @@
 import { ragJobSchema } from "@scraper/shared";
 import { chunkContent } from "../services/chunking/chunker.service.js";
 import { saveChunks } from "../services/page-chunk.service.js";
-
+import { generateEmbeddings } from "../services/embeddings/embedding.service.js";
+import { storeEmbeddings } from "../services/vector/qdrant.service.js";
 
 export async function processRagJob(job:any) {
 
@@ -20,10 +21,36 @@ export async function processRagJob(job:any) {
     );
 
 
-    await saveChunks(
+    const savedChunks = await saveChunks(
         data.pageId,
         chunks
     );
+
+    const vectors = await generateEmbeddings(
+        savedChunks.map(
+            chunk => chunk.content
+        )
+    )
+
+    await storeEmbeddings(
+        savedChunks.map((chunk, index) => ({
+
+            id: chunk.id,
+
+            vector: vectors[index],
+
+            payload: {
+                pageId: data.pageId,
+                content: chunk.content,
+                chunkIndex: chunk.chunkIndex,
+            },
+
+        }))
+    );
+
+    console.log(
+        `Stored ${saveChunks.length} embeddings`
+    )
 
 
     return {
