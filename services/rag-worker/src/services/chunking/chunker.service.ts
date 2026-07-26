@@ -1,38 +1,20 @@
-import { tokenize,detokenize } from "./tokenizer.service";
+import { splitSection } from "./semantic-splitter.service";
 
-interface Chunk {
-    content: string,
-    chunkIndex: number,
-    tokenCount: number,
-}
+export function chunkContent(content:any) {
 
-export function chunkText(text: string, chunkSize = 500, overlap = 100): Chunk[] {
+    const chunks:any[] = [];
 
-    const tokens = tokenize(text);
+    for(const section of content.sections) {
+        const sectionChunks = splitSection(section.heading,section.content);
 
-    const chunks:Chunk[] = [];
-
-    let start = 0;
-    let chunkIndex = 0;
-
-    while(start < tokens.length) {
-
-        const end = Math.min(start+chunkSize, tokens.length);
-
-        const chunkTokens = tokens.slice(start,end);
-
-        chunks.push({
-            content: detokenize(chunkTokens),
-            chunkIndex,
-            tokenCount: chunkTokens.length
-        });
-
-
-        chunkIndex++;
-
-
-        start += chunkSize - overlap;
+        chunks.push(...sectionChunks);
     }
 
-    return chunks;
+    return chunks.map(
+        (chunk,index) =>({
+            content: chunk.content,
+            chunkIndex: index,
+            tokenCount: chunk.tokenCount
+        })
+    );
 }

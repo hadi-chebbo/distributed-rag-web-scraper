@@ -3,6 +3,7 @@ import { fetchPage } from "./fetchers/fetch-strategy.service.js";
 import { parseHtml } from "./parsers/html-parser.service.js";
 import { findPageByUrl, savePage, savePageVersion, updatePage } from "./page.service.js";
 import { generateContentHash } from "./hashing/content-hash.service.js";
+import { ragQueue } from "../queues/rag.queue.js";
 
 
 export async function scraperService(job: unknown) {
@@ -27,6 +28,7 @@ export async function scraperService(job: unknown) {
 
     const existingPage = await findPageByUrl(data.url);
 
+    let page;
 
     if(existingPage) {
 
@@ -55,34 +57,48 @@ export async function scraperService(job: unknown) {
         });
 
 
-        return updatePage(
-            existingPage.id,
-            {
-                title: parsedPage.title ?? "",
-                rawHtml: pageData.html,
-                extractedText: parsedPage.extractedText,
-                contentHash,
-                statusCode: pageData.statusCode,
-                fetchedAt: new Date()
-            }
-        );
-    }
-
-
-    console.log(
+        page = await updatePage(
+                    existingPage.id,
+                    {
+                        title: parsedPage.title ?? "",
+                        rawHtml: pageData.html,
+                        extractedText: parsedPage.extractedText,
+                        contentHash,
+                        statusCode: pageData.statusCode,
+                        fetchedAt: new Date()
+                    }
+                );
+    } else {
+        console.log(
         "New page:",
         data.url
-    );
+        );
 
-    console.log("Generated hash:", contentHash);
+        console.log("Generated hash:", contentHash);
 
-    return savePage({
-        crawlRunId: data.crawlRunId,
-        url: data.url,
-        title: parsedPage.title,
-        rawHtml: pageData.html,
-        extractedText: parsedPage.extractedText,
-        contentHash,
-        statusCode: pageData.statusCode
-    });
+        page = await savePage({
+                    crawlRunId: data.crawlRunId,
+                    url: data.url,
+                    title: parsedPage.title,
+                    rawHtml: pageData.html,
+                    extractedText: parsedPage.extractedText,
+                    contentHash,
+                    statusCode: pageData.statusCode
+                });
+    }
+
+    console.log("Adding RAG job:", page.url);
+
+    await ragQueue.add("process-page", {
+        pageId: page.id,
+        content: {
+            title: parsedPage.title,
+            sections: parsedPage.sections,
+            tables: parsedPage.tables,
+            links: parsedPage.links,
+            documents: parsedPage.documents,
+        },
+    })
+
+    return page;
 }
