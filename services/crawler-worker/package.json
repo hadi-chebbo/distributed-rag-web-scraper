@@ -9,16 +9,17 @@
     "start": "node dist/worker.js"
   },
   "dependencies": {
-    "@scraper/shared": "*",
     "@prisma/client": "^6.19.3",
-    "bullmq": "^5.0.0",
-    "ioredis": "^5.0.0",
+    "@scraper/shared": "*",
     "axios": "^1.0.0",
-    "cheerio": "^1.0.0"
+    "bullmq": "^5.0.0",
+    "cheerio": "^1.0.0",
+    "ioredis": "^5.0.0",
+    "robots-parser": "^3.0.1"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
-    "typescript": "^5.0.0",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.0.0"
   }
 }

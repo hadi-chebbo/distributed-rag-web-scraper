@@ -73,6 +73,7 @@ model PageChunk {
   content   String
 
   chunkIndex Int
+  tokenCount Int?
 
   createdAt DateTime @default(now())
 

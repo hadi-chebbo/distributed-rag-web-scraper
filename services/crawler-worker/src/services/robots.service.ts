@@ -1,26 +1,41 @@
-import robotsParser from "robot-txt-parser";
+import axios from "axios";
+import * as robotsParserImport from "robots-parser";
+
+const robotsParser = robotsParserImport as unknown as (
+    url: string,
+    contents: string
+) => any;
 
 const robotsCache = new Map<string, any>();
 
-const robots = robotsParser({
-    userAgent: "DistributedRAGBOT",
-    allowOnNeutral: true,
-});
-
 export async function isAllowed(url: string) {
-    
     const parsedUrl = new URL(url);
 
-    const domain = `${parsedUrl.protocol}//${parsedUrl.host}`;
+    const robotsUrl = `${parsedUrl.protocol}//${parsedUrl.host}/robots.txt`;
 
-    if(!robotsCache.has(domain)) {
-        await robots.useRobotsFor(domain);
+    let robots = robotsCache.get(robotsUrl);
 
-        robotsCache.set(
-            domain,
-            true
-        );
+    if (!robots) {
+        try {
+            const response = await axios.get(robotsUrl);
+
+            robots = robotsParser(
+                robotsUrl,
+                response.data
+            );
+
+            robotsCache.set(
+                robotsUrl,
+                robots
+            );
+        } catch {
+            // No robots.txt = allowed
+            return true;
+        }
     }
 
-    return robots.canCrawl(url);
+    return robots.isAllowed(
+        url,
+        "DistributedRAGBOT"
+    ) ?? true;
 }

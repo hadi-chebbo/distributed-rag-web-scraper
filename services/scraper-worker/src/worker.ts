@@ -41,6 +41,10 @@ const worker = new Worker(
     }
 );
 
+worker.on("ready", ()=>{
+    console.log("Scraper worker ready");
+});
+
 worker.on("completed", (job, result) => {
     console.log(
         `Scraper job ${job.id} completed`,
