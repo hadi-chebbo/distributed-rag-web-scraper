@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
+import NavBar from "../components/NavBar";
 import ChatInput from "../components/ChatInput";
 import Loading from "../components/Loading";
 
@@ -40,23 +41,7 @@ export default function ChatPage() {
 
     return (
         <div className="h-screen flex flex-col bg-[var(--bg)]">
-            {/* Header */}
-            <header className="border-b border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-sm px-6 py-4">
-                <div className="max-w-3xl mx-auto flex items-center gap-3">
-                    <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75 animate-pulse-dot" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent)]" />
-                    </span>
-                    <div>
-                        <h1 className="text-sm font-semibold tracking-tight text-[var(--ink)]">
-                            AI Assistant
-                        </h1>
-                        <p className="text-xs text-[var(--ink-muted)]">
-                            Ask questions about your scraped data
-                        </p>
-                    </div>
-                </div>
-            </header>
+            <NavBar />
 
             {/* Messages */}
             <main className="flex-1 overflow-y-auto">
