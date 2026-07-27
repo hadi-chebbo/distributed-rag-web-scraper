@@ -41,6 +41,8 @@ export async function processRagJob(job:any) {
 
             payload: {
                 pageId: data.pageId,
+                url: data.url,
+                title: data.title,
                 content: chunk.content,
                 chunkIndex: chunk.chunkIndex,
             },
@@ -49,7 +51,7 @@ export async function processRagJob(job:any) {
     );
 
     console.log(
-        `Stored ${saveChunks.length} embeddings`
+        `Stored ${savedChunks.length} embeddings`
     )
 
 

@@ -45,6 +45,8 @@ export async function storeEmbeddings(
         vector: number[];
         payload: {
             pageId: string;
+            url: string;
+            title: string | null;
             content: string;
             chunkIndex: number;
         };
@@ -69,6 +71,8 @@ export async function storeEmbeddings(
                 payload: {
                     pageId: point.payload.pageId,
                     chunkId: point.id,
+                    url: point.payload.url,
+                    title: point.payload.title,
                     content: point.payload.content,
                     chunkIndex: point.payload.chunkIndex,
                 },

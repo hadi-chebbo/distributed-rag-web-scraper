@@ -95,6 +95,11 @@ export async function scraperService(job: unknown) {
 
     await ragQueue.add("process-page", {
         pageId: page.id,
+
+        url: page.url,
+
+        title: page.title,
+        
         content: {
             title: parsedPage.title,
             sections: parsedPage.sections,

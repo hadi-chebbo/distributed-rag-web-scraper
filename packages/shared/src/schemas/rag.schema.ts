@@ -5,6 +5,10 @@ export const ragJobSchema = z.object({
 
     pageId: z.string(),
 
+    url: z.string().url(),
+
+    title: z.string().nullable(),
+
     content: z.object({
 
         title: z.string().nullable(),
