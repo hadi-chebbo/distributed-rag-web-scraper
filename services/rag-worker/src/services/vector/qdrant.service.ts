@@ -51,6 +51,11 @@ export async function storeEmbeddings(
     }[]
 ) {
 
+    if(points.length == 0) {
+        console.log("No embeddings to store");
+        return;
+    }
+
     await qdrant.upsert(
         COLLECTION_NAME,
         {
