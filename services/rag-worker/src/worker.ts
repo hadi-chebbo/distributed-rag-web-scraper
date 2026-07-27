@@ -1,6 +1,9 @@
 import { Worker } from "bullmq";
 import { redis } from "./redis/connection.js";
 import { processRagJob } from "./processors/rag.processor.js";
+import { ensureCollection } from "./services/vector/qdrant.service.js";
+
+await ensureCollection();
 
 const worker = new Worker(
     "rag",

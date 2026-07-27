@@ -1,4 +1,7 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
+import { v5 as uuidv5 } from "uuid";
+
+const QDRANT_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
 export const qdrant = new QdrantClient({
     url: process.env.QDRANT_URL,
@@ -54,12 +57,13 @@ export async function storeEmbeddings(
             wait: true,
 
             points: points.map(point => ({
-                id: point.id,
+                id: uuidv5(point.id, QDRANT_NAMESPACE),
 
                 vector: point.vector,
 
                 payload: {
                     pageId: point.payload.pageId,
+                    chunkId: point.id,
                     content: point.payload.content,
                     chunkIndex: point.payload.chunkIndex,
                 },
