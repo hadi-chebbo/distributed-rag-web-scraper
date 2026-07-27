@@ -1,7 +1,9 @@
 import { Queue } from "bullmq";
+import { QueueEvents } from "bullmq";
 import { Redis } from "ioredis";
 import { z } from "zod";
 import { ragJobSchema } from "./schemas/rag.schema.js";
+import { askRequestSchema } from "./schemas/query.schema.js";
 
 export function createRedisConnection() {
   return new Redis(process.env.REDIS_URL ?? "redis://localhost:6379", {
@@ -73,6 +75,30 @@ export function createRagQueue() {
       removeOnComplete: 100,
       removeOnFail: false,
     }
+  });
+}
+
+export const QUERY_QUEUE = "query";
+export type QueryJob = z.infer<typeof askRequestSchema>;
+
+export function createQueryQueue() {
+  return new Queue<QueryJob>(QUERY_QUEUE, {
+    connection: createRedisConnection(),
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+      removeOnComplete: 100,
+      removeOnFail: false,
+    }
+  });
+}
+
+export function createQueryQueueEvents() {
+  return new QueueEvents(QUERY_QUEUE, {
+    connection: createRedisConnection(),
   });
 }
 

@@ -1,4 +1,4 @@
-import { qdrant, COLLECTION_NAME } from "./qdrant.service.js";
+import { qdrant, COLLECTION_NAME } from "./qdrant.service";
 
 
 export interface RetrievedChunk {
