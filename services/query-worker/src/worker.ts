@@ -1,6 +1,6 @@
 import { Worker } from "bullmq";
-import { redis } from "../redis/connection.js";
-import { processQueryJob } from "../processors/query.processor.js";
+import { redis } from "./redis/connection.js";
+import { processQueryJob } from "./processors/query.processor.js";
 
 const worker = new Worker(
     "query",

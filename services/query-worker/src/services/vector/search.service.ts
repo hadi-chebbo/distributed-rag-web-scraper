@@ -19,6 +19,7 @@ export async function searchSimilarChunks(vector: number[]): Promise<RetrievedCh
         {
             vector,
             limit: 5,
+            score_threshold:0.6,
             with_payload: true,
         }
     );
