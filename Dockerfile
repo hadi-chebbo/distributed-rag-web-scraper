@@ -2,15 +2,16 @@ FROM node:22-alpine AS base
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
 COPY services/scraper-worker/package.json services/scraper-worker/package.json
 COPY services/crawler-worker/package.json services/crawler-worker/package.json
 COPY services/rag-worker/package.json services/rag-worker/package.json
 COPY services/query-worker/package.json services/query-worker/package.json
 COPY packages/shared/package.json packages/shared/package.json
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -38,15 +39,16 @@ FROM mcr.microsoft.com/playwright:v1.61.1-jammy AS scraper-worker-base
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
 COPY services/scraper-worker/package.json services/scraper-worker/package.json
 COPY services/crawler-worker/package.json services/crawler-worker/package.json
 COPY services/rag-worker/package.json services/rag-worker/package.json
 COPY services/query-worker/package.json services/query-worker/package.json
 COPY packages/shared/package.json packages/shared/package.json
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
