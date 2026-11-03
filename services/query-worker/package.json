@@ -6,6 +6,7 @@
     "dev": "tsx watch src/worker.ts"
   },
   "dependencies": {
+    "@qdrant/js-client-rest": "1.18.0",
     "@scraper/shared": "*",
     "bullmq": "^5.0.0",
     "ioredis": "^5.0.0",
